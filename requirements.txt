@@ -1,0 +1,6 @@
+highway-env 
+git+https://github.com/DLR-RM/stable-baselines3
+gymnasium
+tensorboard
+h5py
+numpy

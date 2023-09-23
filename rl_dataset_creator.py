@@ -1,0 +1,60 @@
+import gymnasium as gym
+import highway_env
+import stable_baselines3
+# from gymnasium.wrappers import RecordVideo
+from stable_baselines3 import DQN, DDPG, PPO
+from stable_baselines3.common.env_util import make_vec_env
+from stable_baselines3.common.noise import NormalActionNoise
+from stable_baselines3.common.vec_env import SubprocVecEnv
+from stable_baselines3.common.callbacks import EvalCallback
+import tensorboard 
+import os
+import h5py
+import numpy as np
+
+# Remember to change number when trying to access different models
+MODEL_TEST_PATH = "racetrack_ppo/model1"
+MODEL_NAME_TEST_PATH = os.path.join(MODEL_TEST_PATH, "model")
+DATASET_NAME = "datasets/model1_data"
+
+def create_dataset():
+  env = gym.make("racetrack-v0", render_mode="rgb_array")
+  model=PPO.load(MODEL_NAME_TEST_PATH)
+  # Data variables
+
+  all_observations = []
+  intermediate_observations = []
+  all_actions = []
+  intermediate_actions = []
+  for episode in range(1):
+      print(f'Episode: {episode}')
+      done = truncated = False
+      obs, info = env.reset() 
+      timestep = 0
+      while not (done or truncated):
+          # Predict
+          action, _states = model.predict(obs, deterministic=True)
+          # Get reward
+          obs, reward, done, truncated, info = env.step(action)
+          # Render
+          env.render()
+          # Collect data
+          intermediate_observations.append(obs)
+          intermediate_actions.append(action)
+          timestep+=1
+      if(timestep>=299):
+         all_observations.extend(intermediate_observations)
+         all_actions.extend(intermediate_actions)
+  
+  env.close()
+  # We are combining both obs arrays, need to make sure we have TWO 12x12 lists.
+  # Make sure they are in the exact same structure
+  all_observations = np.stack(all_observations, axis=0)
+  all_actions = np.stack(all_actions, axis=0)
+  with h5py.File(DATASET_NAME, 'w') as hf:
+      hf.create_dataset("observations", data=all_observations)
+      hf.create_dataset("actions", data=all_actions)
+   
+
+if __name__ == "__main__":
+  create_dataset()
