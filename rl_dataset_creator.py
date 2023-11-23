@@ -15,7 +15,7 @@ import numpy as np
 # Remember to change number when trying to access different models
 MODEL_TEST_PATH = "racetrack_ppo/model1"
 MODEL_NAME_TEST_PATH = os.path.join(MODEL_TEST_PATH, "model")
-DATASET_NAME = "datasets/dataset_name"
+DATASET_NAME = "datasets/long_ppo_data"
 
 def create_dataset():
   env = gym.make("racetrack-v0", render_mode="rgb_array")
