@@ -10,7 +10,7 @@ from stable_baselines3.common.callbacks import EvalCallback
 import tensorboard 
 import os
 
-TRAIN = True
+TRAIN = False
 # Function to automatically generate model names
 def generate_model_names(base_path, train, choice=None):
     existing_models = [file for file in os.listdir(base_path) if os.path.isdir(os.path.join(base_path, file))]
@@ -59,16 +59,9 @@ def train():
     # Train the model
     if TRAIN:
         model.learn(total_timesteps=int(1e5), callback=eval_callback)
-        # Note: changed it back to 1e5 
         model.save(MODEL_NAME_TRAIN_PATH)
         del model
 
-# Note: Right now our test loop makes random choices (line 55), so main_test.py has some potential code (which works well) that we can use to use the model in the testing loop.
-
-# Observation Space:
-# Box(-inf, inf, (2, 12, 12), float32)
-# Action Space:
-# Box(-1.0, 1.0, (1,), float32)
 def test():
   env = gym.make("racetrack-v0", render_mode="rgb_array")
   model=PPO.load(MODEL_NAME_TEST_PATH)
@@ -78,9 +71,10 @@ def test():
       while not (done or truncated):
           # Predict
           action, _states = model.predict(obs, deterministic=True)
-          # action = env.action_space.sample()
           # Get reward
           obs, reward, done, truncated, info = env.step(action)
+          print(obs)
+          print(obs.shape)
           # Render
           env.render()
   env.close()
@@ -90,6 +84,6 @@ if __name__ == "__main__":
         MODEL_NAME_TRAIN_PATH = os.path.join(MODEL_TRAIN_PATH, "model")
         train()
     else:
-        MODEL_TEST_PATH = generate_model_names("racetrack_ppo", train=TRAIN, choice=None)
+        MODEL_TEST_PATH = generate_model_names("racetrack_ppo", train=TRAIN, choice=1)
         MODEL_NAME_TEST_PATH = os.path.join(MODEL_TEST_PATH, "model")
         test()
