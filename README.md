@@ -1,8 +1,6 @@
 # Highway Agents
 
-Compare a Proximal Policy Optimization (PPO) driver with a Spiking Neural Network surrogate for autonomous control on a 2‑D racetrack.
-
---
+Comparing a Proximal Policy Optimization (PPO) driver with a Spiking Neural Network (SNN) surrogate for autonomous control on a 2‑D racetrack.
 
 ## Quick Start
 ```bash
