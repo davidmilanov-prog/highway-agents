@@ -2,12 +2,10 @@ import gymnasium as gym
 import highway_env
 import stable_baselines3
 # from gymnasium.wrappers import RecordVideo
-from stable_baselines3 import DQN, DDPG, PPO
+from stable_baselines3 import PPO
 from stable_baselines3.common.env_util import make_vec_env
-from stable_baselines3.common.noise import NormalActionNoise
 from stable_baselines3.common.vec_env import SubprocVecEnv
 from stable_baselines3.common.callbacks import EvalCallback
-import tensorboard 
 import os
 
 TRAIN = False
@@ -32,7 +30,6 @@ def generate_model_names(base_path, train, choice=None):
     return model_path
 
 def train():
-    
     n_cpu = 7
     batch_size = 64
     env = make_vec_env("racetrack-v0", n_envs=n_cpu, vec_env_cls=SubprocVecEnv)
@@ -73,11 +70,10 @@ def test():
           action, _states = model.predict(obs, deterministic=True)
           # Get reward
           obs, reward, done, truncated, info = env.step(action)
-          print(obs)
-          print(obs.shape)
           # Render
           env.render()
   env.close()
+
 if __name__ == "__main__":
     if TRAIN:
         MODEL_TRAIN_PATH = generate_model_names("racetrack_ppo", train=TRAIN, choice=None)
